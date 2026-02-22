@@ -19,5 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('calendar/', include('googlecalendar.urls')),
+    path('calendar/', include('apps.googlecalendar.urls')),
+    path('spotify/', include('apps.spotify.urls')),
 ]

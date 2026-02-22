@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class GooglecalendarConfig(AppConfig):
+class SpotifyConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'googlecalendar'
+    name = 'apps.spotify'
