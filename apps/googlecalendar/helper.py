@@ -29,7 +29,7 @@ def get_calendar_service(credentials_dict):
         client_secret=credentials_dict['client_secret'],
         scopes=credentials_dict['scopes']
     )
-    service = build('googleapiclient', 'v3', credentials=credentials)
+    service = build('calendar', 'v3', credentials=credentials)
     return service
 
 
