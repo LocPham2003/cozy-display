@@ -1,8 +1,10 @@
 import json
 from django.shortcuts import redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.conf import settings
-from .helper import get_flow, get_calendar_list
+
+from .constants import my_event_groups
+from .helper import get_flow, get_user_calendar_list, get_weekly_event_list
 
 REDIRECT_URI = 'http://127.0.0.1:8000/calendar/oauth/callback/'
 
@@ -37,13 +39,33 @@ def google_callback(request):
     return redirect('calendar_list')
 
 
-def calendar_list(request):
+def calendar_list(request) -> JsonResponse | HttpResponseRedirect:
     """Fetch and return the user's calendar list."""
     # Check if user is authenticated
     if 'credentials' not in request.session:
         return redirect('google_login')
 
     credentials = request.session['credentials']
-    print("Requesting calendar info from Google API")
-    calendars = get_calendar_list(credentials)
-    return JsonResponse(calendars)
+    calendars = get_user_calendar_list(credentials)
+    filtered_calendars = []
+    for calendar in calendars.get('items', []):
+        if calendar.get('summary') in my_event_groups:
+            filtered_calendars.append(calendar)
+    return JsonResponse({"calendars": filtered_calendars})
+
+def event_list(request):
+    """Fetch and return the user's calendar list."""
+    # Check if user is authenticated
+    if 'credentials' not in request.session:
+        return redirect('google_login')
+
+    credentials = request.session['credentials']
+
+    filtered_calendars = json.loads(calendar_list(request).getvalue())
+    calendar_ids = []
+
+    for calendar in filtered_calendars.get('calendars', []):
+        calendar_ids.append(calendar.get('id'))
+
+    events = get_weekly_event_list(credentials, calendar_ids)
+    return JsonResponse(events)

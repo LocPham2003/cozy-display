@@ -6,6 +6,7 @@ from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from django.conf import settings
+from .utils import get_week_range
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 CREDENTIALS_FILE = os.path.join(settings.BASE_DIR, 'credentials.json')
@@ -35,8 +36,19 @@ def get_calendar_service(credentials_dict):
     return service
 
 
-def get_calendar_list(credentials_dict):
+def get_user_calendar_list(credentials_dict):
     """Fetch the list of calendars for the authenticated user."""
     service = get_calendar_service(credentials_dict)
     calendar_list = service.calendarList().list().execute()
     return calendar_list
+
+def get_weekly_event_list(credentials_dict, calendar_ids):
+    service = get_calendar_service(credentials_dict)
+    time_min, time_max = get_week_range()
+    all_events = { "events" : [] }
+
+    for calendar_id in calendar_ids:
+        event_list = service.events().list(calendarId=calendar_id, timeMin=time_min, timeMax=time_max).execute()
+        all_events.get("events").append(event_list)
+
+    return all_events

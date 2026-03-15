@@ -1,0 +1,1 @@
+my_event_groups = ["Working", "Self-caring", "Personals", "Hobbies", "Extra-activities", "Leisure-activities"]
