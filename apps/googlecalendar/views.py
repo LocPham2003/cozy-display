@@ -44,5 +44,6 @@ def calendar_list(request):
         return redirect('google_login')
 
     credentials = request.session['credentials']
+    print("Requesting calendar info from Google API")
     calendars = get_calendar_list(credentials)
     return JsonResponse(calendars)

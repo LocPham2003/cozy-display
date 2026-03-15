@@ -1,13 +1,15 @@
 import os
 import json
+import logging
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from django.conf import settings
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 CREDENTIALS_FILE = os.path.join(settings.BASE_DIR, 'credentials.json')
-
+logger = logging.getLogger(__name__)                   
 
 def get_flow(redirect_uri):
     """Create the OAuth flow instance."""
