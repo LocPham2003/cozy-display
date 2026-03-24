@@ -1,10 +1,11 @@
 import json
 from django.shortcuts import redirect
 from django.http import JsonResponse, HttpResponseRedirect
-from django.conf import settings
 
-from .constants import my_event_groups
-from .helper import get_flow, get_user_calendar_list, get_weekly_event_list
+from apps.googlecalendar.constants import my_event_groups
+from apps.googlecalendar.helpers.calendar_helper import get_user_calendar_list
+from apps.googlecalendar.helpers.event_helper import get_weekly_event_list
+from apps.googlecalendar.helpers.authentication_helper import get_flow
 
 REDIRECT_URI = 'http://127.0.0.1:8000/calendar/oauth/callback/'
 
