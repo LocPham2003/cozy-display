@@ -1,3 +1,5 @@
+import os
+
 my_event_groups = [
     "Working",
     "Self-caring",
@@ -6,4 +8,4 @@ my_event_groups = [
     "Extra-activities",
     "Leisure-activities",
 ]
-REDIRECT_URI = "http://127.0.0.1:8000/calendar/oauth/callback/"
+REDIRECT_URI = os.environ.get("REDIRECT_URI")

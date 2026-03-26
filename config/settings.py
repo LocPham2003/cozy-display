@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -128,5 +131,6 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Google Calendar API
-GOOGLE_CREDENTIALS_PATH = os.environ.get("GOOGLE_CREDENTIALS_PATH", BASE_DIR / os.environ.get("CREDENTIALS_FILE"))
-GOOGLE_SCOPES = [os.environ.get("GOOGLE_CREDENTIALS_PATH")]
+print(os.environ.get("CREDENTIALS_FILE"))
+GOOGLE_CREDENTIALS_PATH = os.path.join(BASE_DIR, os.environ.get("CREDENTIALS_FILE"))
+GOOGLE_SCOPES = [os.environ.get("GOOGLE_SCOPES")]
