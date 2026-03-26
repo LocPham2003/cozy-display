@@ -1,4 +1,4 @@
 credentials.json
 venv
 .idea
-config/settings.py
+.env
