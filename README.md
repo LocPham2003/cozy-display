@@ -7,6 +7,10 @@ A Django app that integrates with Google Calendar.
 - Python 3.12+
 - A Google Cloud project with the **Google Calendar API** enabled and OAuth 2.0 credentials configured
 
+## Resources
+
+- Google calendar API documentations: https://developers.google.com/workspace/calendar/api/guides/overview
+
 ## Google Cloud Setup
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → **OAuth consent screen**
@@ -35,6 +39,11 @@ python manage.py migrate
 source venv/bin/activate
 python manage.py runserver
 ```
+
+## Formatting and linting
+This project uses ruff for formatting
+- ``ruff check`` for linting checks
+- ``ruff format`` to format your files 
 
 Then open `http://127.0.0.1:8000` in your browser.
 
