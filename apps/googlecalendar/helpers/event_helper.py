@@ -7,8 +7,6 @@ def get_weekly_event_list(credentials_dict, calendar_ids):
     service = get_calendar_service(credentials_dict)
     time_min, time_max = get_week_range()
     all_events_list = []
-    print("Getting events for time range: ", time_min, time_max)
-    print("Getting events in the calendars: ", calendar_ids)
     for calendar_id in calendar_ids:
         event_list = (
             service.events()
@@ -44,4 +42,5 @@ def __create_event_dtos(event_lists):
             )
             event_dtos.append(event_dto.__dict__)
 
+    event_dtos.sort(key=lambda e: e['start_time'] or '')
     return event_dtos
