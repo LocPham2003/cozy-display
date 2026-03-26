@@ -42,5 +42,5 @@ def __create_event_dtos(event_lists):
             )
             event_dtos.append(event_dto.__dict__)
 
-    event_dtos.sort(key=lambda e: e['start_time'] or '')
+    event_dtos.sort(key=lambda e: e["start_time"] or "")
     return event_dtos
