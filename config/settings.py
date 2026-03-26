@@ -131,6 +131,5 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Google Calendar API
-print(os.environ.get("CREDENTIALS_FILE"))
 GOOGLE_CREDENTIALS_PATH = os.path.join(BASE_DIR, os.environ.get("CREDENTIALS_FILE"))
 GOOGLE_SCOPES = [os.environ.get("GOOGLE_SCOPES")]
