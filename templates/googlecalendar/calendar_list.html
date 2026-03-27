@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Calendars</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f3f4;
+            padding: 32px 20px;
+        }
+
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .calendar-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px 24px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: box-shadow 0.2s;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .calendar-card:hover {
+            background-color: cornflowerblue;
+        }
+
+        .color-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background-color: var(--cal-color, #1a73e8);
+        }
+
+        .calendar-name {
+            font-size: 1rem;
+            color: #202124;
+            font-weight: 500;
+        }
+
+        .actions {
+            margin-top: 28px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: #1a73e8;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1557b0;
+        }
+
+        .btn-secondary {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d2e3fc;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Calendars</h1>
+
+        <div class="calendar-grid">
+            {% for calendar in calendars %}
+                <div class="calendar-card" data-name="{{ calendar.summary }}" style="--cal-color: {{ calendar.backgroundColor|default:'#1a73e8' }}">
+                    <div class="color-dot"></div>
+                    <span class="calendar-name">{{ calendar.summary }}</span>
+                </div>
+            {% endfor %}
+        </div>
+
+    <ul id="selected-list"></ul>
+
+    <div class="actions">
+        <a href="{% url 'event_list' %}" class="btn btn-primary">View Events</a>
+        <a href="{% url 'google_login' %}" class="btn btn-secondary">Re-authenticate</a>
+    </div>
+    <script>
+        const selected = new Set();
+        const selectedList = document.getElementById('selected-list');
+
+        document.querySelectorAll('.calendar-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const name = card.dataset.name;
+                if (selected.has(name)) {
+                    selected.delete(name);
+                    card.classList.remove('selected');
+                } else {
+                    selected.add(name);
+                    card.classList.add('selected');
+                }
+                selectedList.innerHTML = '';
+                selected.forEach(n => {
+                    const li = document.createElement('li');
+                    li.textContent = n;
+                    selectedList.appendChild(li);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
