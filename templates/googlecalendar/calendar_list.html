@@ -23,6 +23,12 @@
             font-size: 1.8rem;
         }
 
+        h2 {
+            color: #1a73e8;
+            margin-bottom: 24px;
+            font-size: 1.2rem;
+        }
+
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -102,39 +108,54 @@
 
         <div class="calendar-grid">
             {% for calendar in calendars %}
-                <div class="calendar-card" data-name="{{ calendar.summary }}" style="--cal-color: {{ calendar.backgroundColor|default:'#1a73e8' }}">
+                <div class="calendar-card" data-id="{{ calendar.id }}" data-name="{{ calendar.summary }}" style="--cal-color: {{ calendar.backgroundColor|default:'#1a73e8' }}">
                     <div class="color-dot"></div>
                     <span class="calendar-name">{{ calendar.summary }}</span>
                 </div>
             {% endfor %}
         </div>
 
+    <h2>Selected calendars</h2>
     <ul id="selected-list"></ul>
 
     <div class="actions">
-        <a href="{% url 'event_list' %}" class="btn btn-primary">View Events</a>
+        <form id="calendar-form" method="POST" action="{% url 'event_list' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">View Events</button>
+        </form>
         <a href="{% url 'google_login' %}" class="btn btn-secondary">Re-authenticate</a>
     </div>
     <script>
-        const selected = new Set();
+        const selected = new Map(); // id -> name
         const selectedList = document.getElementById('selected-list');
 
         document.querySelectorAll('.calendar-card').forEach(card => {
             card.addEventListener('click', () => {
+                const id = card.dataset.id;
                 const name = card.dataset.name;
-                if (selected.has(name)) {
-                    selected.delete(name);
+                if (selected.has(id)) {
+                    selected.delete(id);
                     card.classList.remove('selected');
                 } else {
-                    selected.add(name);
+                    selected.set(id, name);
                     card.classList.add('selected');
                 }
                 selectedList.innerHTML = '';
-                selected.forEach(n => {
+                selected.forEach(name => {
                     const li = document.createElement('li');
-                    li.textContent = n;
+                    li.textContent = name;
                     selectedList.appendChild(li);
                 });
+            });
+        });
+
+        document.getElementById('calendar-form').addEventListener('submit', () => {
+            selected.forEach((name, id) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'calendar_ids';
+                input.value = id;
+                document.getElementById('calendar-form').appendChild(input);
             });
         });
     </script>

@@ -52,8 +52,6 @@ def event_list(request):
         return redirect("google_login")
 
     credentials = request.session["credentials"]
-    calendars = get_user_calendar_list(credentials)
-    calendar_ids = [cal["id"] for cal in
-                    calendars.get("items", [])]
+    calendar_ids = request.POST.getlist("calendar_ids")
     events = get_weekly_event_list(credentials, calendar_ids)
     return JsonResponse(events)
