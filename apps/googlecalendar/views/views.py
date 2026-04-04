@@ -36,6 +36,8 @@ def google_callback(request):
     }
     return redirect("calendar_list")
 
+def index(request):
+    return render(request, "googlecalendar/index.html")
 
 def calendar_list(request):
     """Render the user's calendar list as an HTML page."""
