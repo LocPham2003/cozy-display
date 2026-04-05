@@ -1,11 +1,11 @@
-import json
-from django.shortcuts import redirect
-from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render
+from django.http import JsonResponse
 
-from apps.googlecalendar.constants import my_event_groups, REDIRECT_URI
+from apps.googlecalendar.constants import REDIRECT_URI
 from apps.googlecalendar.helpers.calendar_helper import get_user_calendar_list
 from apps.googlecalendar.helpers.event_helper import get_weekly_event_list
 from apps.googlecalendar.helpers.authentication_helper import get_flow
+
 
 def google_login(request):
     """Redirect the user to Google's OAuth consent screen."""
@@ -36,35 +36,27 @@ def google_callback(request):
     }
     return redirect("calendar_list")
 
+def index(request):
+    return render(request, "googlecalendar/index.html")
 
-def calendar_list(request) -> JsonResponse | HttpResponseRedirect:
-    """Fetch and return the user's calendar list."""
-    # Check if user is authenticated
+def calendar_list(request):
+    """Render the user's calendar list as an HTML page."""
     if "credentials" not in request.session:
         return redirect("google_login")
 
     credentials = request.session["credentials"]
     calendars = get_user_calendar_list(credentials)
-    filtered_calendars = []
-    for calendar in calendars.get("items", []):
-        if calendar.get("summary") in my_event_groups:
-            filtered_calendars.append(calendar)
-    return JsonResponse({"calendars": filtered_calendars})
+    return render(
+        request, "googlecalendar/calendar_list.html", {"calendars": calendars["items"]}
+    )
 
 
 def event_list(request):
-    """Fetch and return the user's calendar list."""
-    # Check if user is authenticated
+    """Fetch and return the user's event list."""
     if "credentials" not in request.session:
         return redirect("google_login")
 
     credentials = request.session["credentials"]
-
-    filtered_calendars = json.loads(calendar_list(request).getvalue())
-    calendar_ids = []
-
-    for calendar in filtered_calendars.get("calendars", []):
-        calendar_ids.append(calendar.get("id"))
-
+    calendar_ids = request.POST.getlist("calendar_ids")
     events = get_weekly_event_list(credentials, calendar_ids)
     return JsonResponse(events)
