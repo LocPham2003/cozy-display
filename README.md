@@ -1,6 +1,7 @@
 # Smart Calendar
 
-A Django app that integrates with Google Calendar.
+A Django app that integrates with Google Calendar and Spotify and fetches misc data for display/ personal use. I fetched these data and use them on an E-ink display, connected to a 
+Raspberry Pi 3 using a C++ server (tbu)
 
 ## Prerequisites
 
@@ -10,6 +11,7 @@ A Django app that integrates with Google Calendar.
 ## Resources
 
 - Google calendar API documentations: https://developers.google.com/workspace/calendar/api/guides/overview
+- Spotify documentations: https://developer.spotify.com/documentation/web-api
 
 ## Google Cloud Setup
 
@@ -32,6 +34,9 @@ pip install -r requirements.txt
 # Run migrations
 python manage.py migrate
 ```
+
+## Endpoints
+Check out the `views` folder in the googlecalendar and spotify apps. 
 
 ## Running the App
 
