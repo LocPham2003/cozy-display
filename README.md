@@ -1,4 +1,13 @@
-# Smart Calendar
+# Todo
+- [ ] Set up CI/CD for the project
+- [ ] Write unit and integration tests
+- [ ] Create the C++ server
+- [ ] Add some analytics for spotify app
+
+Stretch
+- [ ] Containerize the application
+
+# Cozy display
 
 A Django app that integrates with Google Calendar and Spotify and fetches misc data for display/ personal use. I fetched these data and use them on an E-ink display, connected to a 
 Raspberry Pi 3 using a C++ server (tbu)
