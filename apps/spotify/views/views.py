@@ -1,25 +1,38 @@
+import json
 import os
+import time
+from unittest import skip
 
-from django.http import JsonResponse
+from django.http import JsonResponse, StreamingHttpResponse
+from django.core.cache import cache
+from apps.spotify.helpers.playback_helper import get_playback, get_stream_data
 from django.shortcuts import render, redirect
 from dotenv import load_dotenv
 import base64
 import requests
 import uuid
 from urllib.parse import urlencode
-from apps.spotify.constants import scope
+from apps.spotify.constants import scope, curr_playback_key
 
 redirect_uri = os.environ["SPOTIFY_REDIRECT_URI"]
 client_id = os.environ["SPOTIFY_CLIENT_ID"]
 
 load_dotenv()
 
+authorize_url = "https://accounts.spotify.com/authorize?"
+token_url = "https://accounts.spotify.com/api/token"
+
+# Data-specific url
+playback_url = "https://api.spotify.com/v1/me/player"
+top_artists = "https://api.spotify.com/v1/me/top/artists"
+curr_playing_url = "https://api.spotify.com/v1/me/player/currently-playing"
+
 
 def index(request):
     return render(request, "spotify/index.html")
 
 
-def login(request):
+def login():
     state = str(uuid.uuid4())
 
     response_type = "code"
@@ -31,7 +44,7 @@ def login(request):
         "redirect_uri": redirect_uri,
         "state": state,
     }
-    url = "https://accounts.spotify.com/authorize?" + urlencode(params)
+    url = authorize_url + urlencode(params)
     return redirect(url)
 
 
@@ -47,7 +60,7 @@ def callback(request):
     credentials = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
 
     response = requests.post(
-        "https://accounts.spotify.com/api/token",
+        token_url,
         data={
             "code": code,
             "redirect_uri": redirect_uri,
@@ -60,24 +73,44 @@ def callback(request):
     )
 
     request.session["spotify_credentials"] = response.json().get("access_token")
-    print(request.session["spotify_credentials"])
-    return redirect("top_tracks")
+    return redirect("spotify-home")
 
 
-def top_tracks(request):
+def home(request):
+    return render(request, "spotify/home.html")
+
+
+def curr_playback(request):
     if "spotify_credentials" not in request.session:
         return redirect("spotify-login")
 
-    access_token = request.session["spotify_credentials"]
-    url = "https://api.spotify.com/v1/me/top/artists"
+    return JsonResponse({"curr_playback_data": cache.get(curr_playback_key)})
 
-    response = requests.get(
-        url,
-        headers={
-            "Authorization": f"Bearer {access_token}",
-        },
-    )
 
-    print(response.json())
+def track_progress_stream(request):
+    if "spotify_credentials" not in request.session:
+        return redirect("spotify-login")
 
-    return JsonResponse({"top_tracks": []})
+    def stream():
+        while True:
+            access_token = request.session["spotify_credentials"]
+            stream_data = get_stream_data(access_token)
+
+            if stream_data.get("currently_playing") is not None:
+                if not cache.get(curr_playback_key):
+                    cache.set(curr_playback_key, get_playback(access_token))
+
+                curr_playback_data = cache.get(curr_playback_key)
+                if curr_playback_data.get("track_id") != stream_data.get("track_id"):
+                    cache.set(curr_playback_key, get_playback(access_token))
+
+                yield json.dumps(stream_data) + "\n"
+            else:
+                yield (
+                    json.dumps({"status": "No track is playing, start one on Spotify!"})
+                    + "\n"
+                )
+
+            time.sleep(1)
+
+    return StreamingHttpResponse(stream())
