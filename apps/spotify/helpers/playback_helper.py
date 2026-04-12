@@ -46,9 +46,12 @@ def get_playback(access_token):
     elif response.status_code == 401:
         return {"error": "Token expired, please login again"}
     elif response.status_code == 204:
-        return {"error": "Playback is currently unavailable. Play something on spotify!"}
+        return {
+            "error": "Playback is currently unavailable. Play something on spotify!"
+        }
 
     return {"error": "Something went wrong, please try again"}
+
 
 def get_stream_data(access_token):
     response = requests.get(
@@ -75,6 +78,8 @@ def get_stream_data(access_token):
     elif response.status_code == 401:
         return {"error": "Token expired, please login again"}
     elif response.status_code == 204:
-        return {"error": "Playback is currently unavailable. Play something on spotify!"}
+        return {
+            "error": "Playback is currently unavailable. Play something on spotify!"
+        }
 
     return {"error": "Something went wrong, please try again"}

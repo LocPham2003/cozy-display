@@ -106,15 +106,14 @@ def track_progress_stream(request):
                     cache.set(curr_playback_key, get_playback(access_token))
                 else:
                     curr_playback_data = cache.get(curr_playback_key)
-                    if curr_playback_data.get("track_id") != stream_data.get("track_id"):
+                    if curr_playback_data.get("track_id") != stream_data.get(
+                        "track_id"
+                    ):
                         cache.set(curr_playback_key, get_playback(access_token))
 
                 yield json.dumps(stream_data) + "\n"
             else:
-                yield (
-                    json.dumps(stream_data)
-                    + "\n"
-                )
+                yield (json.dumps(stream_data) + "\n")
 
             time.sleep(1)
 
