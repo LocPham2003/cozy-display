@@ -18,8 +18,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from apps.views import index
+
 urlpatterns = [
-    path('', index, name='index'),
+    path("", index, name="index"),
     path("admin/", admin.site.urls),
     path("calendar/", include("apps.googlecalendar.urls")),
     path("spotify/", include("apps.spotify.urls")),

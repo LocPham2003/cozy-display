@@ -7,6 +7,10 @@ from apps.googlecalendar.helpers.event_helper import get_weekly_event_list
 from apps.googlecalendar.helpers.authentication_helper import get_flow
 
 
+def index(request):
+    return render(request, "googlecalendar/index.html")
+
+
 def google_login(request):
     """Redirect the user to Google's OAuth consent screen."""
     flow = get_flow(REDIRECT_URI)
@@ -36,8 +40,6 @@ def google_callback(request):
     }
     return redirect("calendar_list")
 
-def index(request):
-    return render(request, "googlecalendar/index.html")
 
 def calendar_list(request):
     """Render the user's calendar list as an HTML page."""
