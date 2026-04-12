@@ -1,9 +1,9 @@
 from apps.googlecalendar.utils import get_week_range
 from .helper import get_calendar_service
-from ..models import EventDto
+from ..dto.EventDto import EventDto, EventObj
 
 
-def get_weekly_event_list(credentials_dict, calendar_ids):
+def get_weekly_event_list(credentials_dict, calendar_ids) -> EventObj:
     service = get_calendar_service(credentials_dict)
     time_min, time_max = get_week_range()
     all_events_list = []
@@ -24,7 +24,7 @@ def get_weekly_event_list(credentials_dict, calendar_ids):
     return {"events": event_dtos}
 
 
-def __create_event_dtos(event_lists):
+def __create_event_dtos(event_lists) -> list[EventDto]:
     event_dtos = []
     for event_list in event_lists:
         for event in event_list["items"]:
