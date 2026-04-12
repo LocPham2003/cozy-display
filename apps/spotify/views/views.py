@@ -83,6 +83,12 @@ def curr_playback(request):
     if "spotify_credentials" not in request.session:
         return redirect("spotify-login")
 
+    access_token = request.session["spotify_credentials"]
+
+    playback_data = get_playback(access_token)
+    if "currently_playing" in playback_data:
+        cache.set(curr_playback_key, get_playback(access_token))
+
     return JsonResponse({"curr_playback_data": cache.get(curr_playback_key)})
 
 
