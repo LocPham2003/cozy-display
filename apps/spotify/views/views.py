@@ -16,6 +16,7 @@ from apps.spotify.constants import scope, curr_playback_key
 
 redirect_uri = os.environ["SPOTIFY_REDIRECT_URI"]
 client_id = os.environ["SPOTIFY_CLIENT_ID"]
+client_secret = os.environ["SPOTIFY_CLIENT_SECRET"]
 
 load_dotenv()
 
@@ -32,7 +33,7 @@ def index(request):
     return render(request, "spotify/index.html")
 
 
-def login():
+def login(request):
     state = str(uuid.uuid4())
 
     response_type = "code"
@@ -54,8 +55,6 @@ def callback(request):
 
     if state is None:
         return redirect("/")
-
-    client_secret = os.environ["SPOTIFY_CLIENT_SECRET"]
 
     credentials = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
 
@@ -84,6 +83,12 @@ def curr_playback(request):
     if "spotify_credentials" not in request.session:
         return redirect("spotify-login")
 
+    access_token = request.session["spotify_credentials"]
+
+    playback_data = get_playback(access_token)
+    if "currently_playing" in playback_data:
+        cache.set(curr_playback_key, get_playback(access_token))
+
     return JsonResponse({"curr_playback_data": cache.get(curr_playback_key)})
 
 
@@ -96,20 +101,19 @@ def track_progress_stream(request):
             access_token = request.session["spotify_credentials"]
             stream_data = get_stream_data(access_token)
 
-            if stream_data.get("currently_playing") is not None:
+            if "currently_playing" in stream_data:
                 if not cache.get(curr_playback_key):
                     cache.set(curr_playback_key, get_playback(access_token))
-
-                curr_playback_data = cache.get(curr_playback_key)
-                if curr_playback_data.get("track_id") != stream_data.get("track_id"):
-                    cache.set(curr_playback_key, get_playback(access_token))
+                else:
+                    curr_playback_data = cache.get(curr_playback_key)
+                    if curr_playback_data.get("track_id") != stream_data.get(
+                        "track_id"
+                    ):
+                        cache.set(curr_playback_key, get_playback(access_token))
 
                 yield json.dumps(stream_data) + "\n"
             else:
-                yield (
-                    json.dumps({"status": "No track is playing, start one on Spotify!"})
-                    + "\n"
-                )
+                yield (json.dumps(stream_data) + "\n")
 
             time.sleep(1)
 
