@@ -1,4 +1,5 @@
 # Todo
+- [ ] Clean up (e.g. type casting, restructures, etc.)
 - [ ] Set up CI/CD for the project
 - [ ] Write unit and integration tests
 - [ ] Create the C++ server
