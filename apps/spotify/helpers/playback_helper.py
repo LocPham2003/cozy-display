@@ -1,7 +1,6 @@
 import requests
 
 from apps.spotify.dto.playback_dto import (
-    PlaybackData,
     PlaybackResult,
     PlaybackError,
     Album,
@@ -39,7 +38,7 @@ def get_playback(access_token) -> PlaybackResult | PlaybackError:
         for artist_object in playback_item.get("artists"):
             artists.append(artist_object.get("name"))
 
-        playback_data = PlaybackData(
+        playback_result = PlaybackResult(
             repeat_state=playback_object.get("repeat_state"),
             track_id=playback_item.get("id"),
             track_name=playback_item.get("name"),
@@ -47,7 +46,7 @@ def get_playback(access_token) -> PlaybackResult | PlaybackError:
             artist=artists,
         )
 
-        return PlaybackResult(playback_data=playback_data)
+        return playback_result
     elif response.status_code == 401:
         error = PlaybackError(error="Token expired, please login again")
     elif response.status_code == 204:

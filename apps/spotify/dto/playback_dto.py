@@ -12,16 +12,12 @@ class Album(TypedDict):
     cover: AlbumCover
 
 
-class PlaybackData(TypedDict):
+class PlaybackResult(TypedDict):
     repeat_state: str
     track_id: str
     track_name: str
     album: Album
     artist: list[str]
-
-
-class PlaybackResult(TypedDict):
-    playback_data: PlaybackData
 
 
 class PlaybackError(TypedDict):
