@@ -1,32 +1,23 @@
+import base64
 import json
 import os
 import time
-from unittest import skip
-
-from django.http import JsonResponse, StreamingHttpResponse
-from django.core.cache import cache
-from apps.spotify.helpers.playback_helper import get_playback, get_stream_data
-from django.shortcuts import render, redirect
-from dotenv import load_dotenv
-import base64
-import requests
 import uuid
 from urllib.parse import urlencode
-from apps.spotify.constants import scope, curr_playback_key
+
+import requests
+from django.http import JsonResponse, StreamingHttpResponse
+from django.shortcuts import render, redirect
+from dotenv import load_dotenv
+
+from apps.spotify.constants import scope, authorize_url, token_url
+from apps.spotify.helpers.playback_helper import get_playback, get_stream_data
+
+load_dotenv()
 
 redirect_uri = os.environ["SPOTIFY_REDIRECT_URI"]
 client_id = os.environ["SPOTIFY_CLIENT_ID"]
 client_secret = os.environ["SPOTIFY_CLIENT_SECRET"]
-
-load_dotenv()
-
-authorize_url = "https://accounts.spotify.com/authorize?"
-token_url = "https://accounts.spotify.com/api/token"
-
-# Data-specific url
-playback_url = "https://api.spotify.com/v1/me/player"
-top_artists = "https://api.spotify.com/v1/me/top/artists"
-curr_playing_url = "https://api.spotify.com/v1/me/player/currently-playing"
 
 
 def index(request):
@@ -35,7 +26,6 @@ def index(request):
 
 def login(request):
     state = str(uuid.uuid4())
-
     response_type = "code"
 
     params = {
@@ -84,12 +74,8 @@ def curr_playback(request):
         return redirect("spotify-login")
 
     access_token = request.session["spotify_credentials"]
-
     playback_data = get_playback(access_token)
-    if "currently_playing" in playback_data:
-        cache.set(curr_playback_key, get_playback(access_token))
-
-    return JsonResponse({"curr_playback_data": cache.get(curr_playback_key)})
+    return JsonResponse({"curr_playback_data": playback_data})
 
 
 def track_progress_stream(request):
@@ -100,21 +86,7 @@ def track_progress_stream(request):
         while True:
             access_token = request.session["spotify_credentials"]
             stream_data = get_stream_data(access_token)
-
-            if "currently_playing" in stream_data:
-                if not cache.get(curr_playback_key):
-                    cache.set(curr_playback_key, get_playback(access_token))
-                else:
-                    curr_playback_data = cache.get(curr_playback_key)
-                    if curr_playback_data.get("track_id") != stream_data.get(
-                        "track_id"
-                    ):
-                        cache.set(curr_playback_key, get_playback(access_token))
-
-                yield json.dumps(stream_data) + "\n"
-            else:
-                yield (json.dumps(stream_data) + "\n")
-
+            yield json.dumps(stream_data) + "\n"
             time.sleep(1)
 
     return StreamingHttpResponse(stream())
