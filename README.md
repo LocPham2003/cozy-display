@@ -7,7 +7,7 @@
 
 Stretch
 - [ ] Containerize the application
-- [ ] Weather/ Daily activity app with Apple watch
+- [ ] Weather/ Daily activity app with Apple Watch
 
 # Cozy display
 
