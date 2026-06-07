@@ -50,10 +50,17 @@ python manage.py migrate
 Check out the `views` folder in the googlecalendar and spotify apps. 
 
 ## Running the App
+I have containerized this application. You can run it via 2 ways
 
+The venv way
 ```bash
 source venv/bin/activate
 python manage.py runserver
+```
+
+The docker way
+```bash
+docker compose up --build
 ```
 
 ## Formatting and linting

@@ -17,6 +17,7 @@ services:
     env_file:
       - .env
     volumes:
+      - .:/app
       - ./credentials.json:/app/credentials.json
     depends_on:
       - db

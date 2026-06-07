@@ -6,11 +6,12 @@ import uuid
 from urllib.parse import urlencode
 
 import requests
+from django.core.cache import cache
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import render, redirect
 from dotenv import load_dotenv
 
-from apps.spotify.constants import scope, authorize_url, token_url
+from apps.spotify.constants import scope, authorize_url, token_url, curr_playback_key
 from apps.spotify.helpers.playback_helper import get_playback, get_stream_data
 
 load_dotenv()
@@ -75,7 +76,13 @@ def curr_playback(request):
 
     access_token = request.session["spotify_credentials"]
     playback_data = get_playback(access_token)
+    if "error" not in playback_data:
+        cache.set(curr_playback_key, playback_data)
     return JsonResponse({"curr_playback_data": playback_data})
+
+
+def cached_playback(request):
+    return JsonResponse({"curr_playback_data": cache.get(curr_playback_key)})
 
 
 def track_progress_stream(request):
